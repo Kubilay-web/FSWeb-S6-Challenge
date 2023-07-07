@@ -1,16 +1,46 @@
-import React from 'react';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Arama from "./components/Arama";
+import Section from "./components/Section";
 
 const App = () => {
-  // Try to think through what state you'll need for this app before starting. Then build out
-  // the state properties here.
+  const [data, setData] = useState([]);
+  const [arama, setArama] = useState("");
+  const [icerik, setIcerik] = useState("");
 
-  // Fetch characters from the API in an effect hook. Remember, anytime you have a 
-  // side effect in a component, you want to think about which state and/or props it should
-  // sync up with, if any.
+  useEffect(() => {
+    axios.get("https://swapi.dev/api/people/")
+      .then((response) => setData(response.data));
+  }, []);
+
+  function handleClick(name) {
+    setIcerik(name === icerik ? null : name);
+  }
+
+  const filteredData = data.filter((person) => {
+    if (arama === "") {
+      return person;
+    } else if (person.name.toLowerCase().includes(arama.toLowerCase())) {
+      return person;
+    }
+  });
+
+  const sections = filteredData.map((person) => (
+    <Section
+      key={person.name}
+      data={person}
+      handleClick={handleClick}
+      icerik={icerik}
+      setIcerik={setIcerik}
+    />
+  ));
 
   return (
     <div className="App">
       <h1 className="Header">Karakterler</h1>
+      <h1 className="Header">Star Wars Characters List</h1>
+      <Arama setArama={setArama} arama={arama} />
+      {sections}
     </div>
   );
 }
